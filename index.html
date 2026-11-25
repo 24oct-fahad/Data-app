@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>محوّل التاريخ</title>
+  <meta name="theme-color" content="#0f766e" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="محوّل التاريخ" />
+  <link rel="manifest" href="./manifest.json" />
+  <link rel="apple-touch-icon" href="./icon-192.png" />
+  <style>
+    :root {
+      --bg: #f1f5f9;
+      --card: #ffffff;
+      --text: #0f172a;
+      --muted: #64748b;
+      --primary: #0f766e;
+      --primary-hover: #115e59;
+      --primary-soft: #f0fdfa;
+      --border: #e2e8f0;
+      --warn-bg: #fffbeb;
+      --warn-text: #b45309;
+      --shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.08);
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #0f172a;
+        --card: #1e293b;
+        --text: #f8fafc;
+        --muted: #94a3b8;
+        --primary: #14b8a6;
+        --primary-hover: #0d9488;
+        --primary-soft: rgba(20, 184, 166, 0.12);
+        --border: #334155;
+        --warn-bg: rgba(245, 158, 11, 0.15);
+        --warn-text: #fbbf24;
+        --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.4);
+      }
+    }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      padding: max(20px, env(safe-area-inset-top)) 16px max(24px, env(safe-area-inset-bottom));
+    }
+    .app {
+      width: 100%;
+      max-width: 460px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    header {
+      text-align: center;
+      padding-top: 8px;
+    }
+    header h1 {
+      margin: 0;
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: var(--primary);
+    }
+    header p {
+      margin: 4px 0 0;
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+    .card {
+      background: var(--card);
+      border-radius: 20px;
+      padding: 20px;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+    }
+    .tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      background: var(--bg);
+      padding: 5px;
+      border-radius: 14px;
+      margin-bottom: 18px;
+    }
+    .tab {
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      font-size: 0.95rem;
+      font-weight: 700;
+      padding: 11px 8px;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+    .tab.active {
+      background: var(--primary);
+      color: #ffffff;
+      box-shadow: 0 2px 8px rgba(15, 118, 110, 0.25);
+    }
+    .inputs-grid {
+      display: grid;
+      grid-template-columns: 1fr 1.6fr 1.2fr;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .field label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--muted);
+    }
+    select, input[type="number"] {
+      width: 100%;
+      padding: 12px 10px;
+      border-radius: 12px;
+      border: 1.5px solid var(--border);
+      background: var(--bg);
+      color: var(--text);
+      font-size: 1rem;
+      font-weight: 600;
+      font-family: inherit;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    select:focus, input:focus {
+      border-color: var(--primary);
+    }
+    .actions {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+    .btn {
+      flex: 1;
+      border: none;
+      border-radius: 12px;
+      padding: 12px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: inherit;
+      transition: transform 0.1s, opacity 0.2s;
+    }
+    .btn:active { transform: scale(0.98); }
+    .btn-primary {
+      background: var(--primary);
+      color: #fff;
+    }
+    .btn-secondary {
+      background: var(--bg);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+    .result-box {
+      background: var(--primary-soft);
+      border: 1.5px solid var(--primary);
+      border-radius: 16px;
+      padding: 18px;
+      text-align: center;
+      margin-top: 14px;
+    }
+    .result-label {
+      font-size: 0.85rem;
+      color: var(--muted);
+      margin-bottom: 6px;
+      font-weight: 600;
+    }
+    .result-main {
+      font-size: 1.45rem;
+      font-weight: 800;
+      color: var(--primary);
+      line-height: 1.5;
+    }
+    .result-sub {
+      font-size: 0.95rem;
+      color: var(--text);
+      margin-top: 6px;
+      font-weight: 600;
+    }
+    .copy-btn {
+      margin-top: 12px;
+      background: var(--card);
+      color: var(--primary);
+      border: 1px solid var(--primary);
+      padding: 8px 18px;
+      border-radius: 999px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    .warn {
+      display: none;
+      margin-top: 12px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      background: var(--warn-bg);
+      color: var(--warn-text);
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-align: center;
+    }
+    .quick-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      margin-top: 12px;
+    }
+    .chip {
+      flex: 1;
+      background: var(--card);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      padding: 9px 10px;
+      border-radius: 12px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    .chip:active { background: var(--bg); }
+    footer {
+      text-align: center;
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-top: auto;
+      padding-top: 8px;
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header>
+      <h1>محوّل التاريخ</h1>
+      <p>تقويم أم القرى • بدون إعلانات • يعمل بدون إنترنت</p>
+    </header>
+
+    <div class="card">
+      <div class="tabs">
+        <button class="tab active" id="tab-g2h" onclick="setMode('g2h')">ميلادي ← هجري</button>
+        <button class="tab" id="tab-h2g" onclick="setMode('h2g')">هجري ← ميلادي</button>
+      </div>
+
+      <div class="inputs-grid">
+        <div class="field">
+          <label for="day">اليوم</label>
+          <select id="day" onchange="convert()"></select>
+        </div>
+        <div class="field">
+          <label for="month">الشهر</label>
+          <select id="month" onchange="convert()"></select>
+        </div>
+        <div class="field">
+          <label for="year">السنة</label>
+          <input type="number" id="year" inputmode="numeric" oninput="convert()" />
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="btn btn-primary" onclick="convert()">تحويل</button>
+        <button class="btn btn-secondary" onclick="swapMode()">عكس ⇄</button>
+        <button class="btn btn-secondary" onclick="setToday()">اليوم</button>
+      </div>
+
+      <div class="warn" id="warnBox"></div>
+
+      <div class="result-box" id="resultBox">
+        <div class="result-label" id="resLabel">التاريخ الهجري الموافق</div>
+        <div class="result-main" id="resMain">—</div>
+        <div class="result-sub" id="resSub">—</div>
+        <button class="copy-btn" id="copyBtn" onclick="copyResult()">نسخ النتيجة</button>
+      </div>
+    </div>
+
+    <div class="quick-row">
+      <button class="chip" onclick="testExample()">تجربة: 2 فبراير 2010</button>
+      <button class="chip" onclick="setToday()">تاريخ اليوم</button>
+    </div>
+
+    <footer>يعمل محلياً على جهازك بالكامل • خصوصية 100%</footer>
+  </div>
+
+  <script>
+    const GREG_MONTHS = [
+      'يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو',
+      'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'
+    ];
+    const HIJRI_MONTHS = [
+      'محرم', 'صفر', 'ربيع الأول', 'ربيع الآخر', 'جمادى الأولى', 'جمادى الآخرة',
+      'رجب', 'شعبان', 'رمضان', 'شوال', 'ذو القعدة', 'ذو الحجة'
+    ];
+    const DAYS_AR = ['الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
+
+    let mode = 'g2h'; // 'g2h' or 'h2g'
+    let lastConverted = null;
+
+    const hijriFmt = new Intl.DateTimeFormat('en-US-u-ca-islamic-umalqura', {
+      day: 'numeric', month: 'numeric', year: 'numeric', timeZone: 'UTC'
+    });
+
+    function getHijriParts(utcDate) {
+      const parts = hijriFmt.formatToParts(utcDate);
+      let d = 1, m = 1, y = 1400;
+      for (const p of parts) {
+        if (p.type === 'day') d = parseInt(p.value, 10);
+        if (p.type === 'month') m = parseInt(p.value, 10);
+        if (p.type === 'year') y = parseInt(p.value, 10);
+      }
+      return { d, m, y };
+    }
+
+    function populateSelectors() {
+      const daySel = document.getElementById('day');
+      const monthSel = document.getElementById('month');
+      const curD = parseInt(daySel.value, 10) || 1;
+      const curM = parseInt(monthSel.value, 10) || 1;
+
+      const maxDays = mode === 'g2h' ? 31 : 30;
+      daySel.innerHTML = '';
+      for (let i = 1; i <= maxDays; i++) {
+        const opt = document.createElement('option');
+        opt.value = i;
+        opt.textContent = i;
+        daySel.appendChild(opt);
+      }
+      daySel.value = Math.min(curD, maxDays);
+
+      const months = mode === 'g2h' ? GREG_MONTHS : HIJRI_MONTHS;
+      monthSel.innerHTML = '';
+      months.forEach((name, idx) => {
+        const opt = document.createElement('option');
+        opt.value = idx + 1;
+        opt.textContent = `${idx + 1} - ${name}`;
+        monthSel.appendChild(opt);
+      });
+      monthSel.value = Math.min(curM, 12);
+    }
+
+    function setMode(newMode, keepValues = false) {
+      mode = newMode;
+      document.getElementById('tab-g2h').classList.toggle('active', mode === 'g2h');
+      document.getElementById('tab-h2g').classList.toggle('active', mode === 'h2g');
+      populateSelectors();
+      if (!keepValues) setToday();
+      else convert();
+    }
+
+    function swapMode() {
+      if (!lastConverted) {
+        setMode(mode === 'g2h' ? 'h2g' : 'g2h');
+        return;
+      }
+      const nextMode = mode === 'g2h' ? 'h2g' : 'g2h';
+      mode = nextMode;
+      document.getElementById('tab-g2h').classList.toggle('active', mode === 'g2h');
+      document.getElementById('tab-h2g').classList.toggle('active', mode === 'h2g');
+      populateSelectors();
+      document.getElementById('day').value = lastConverted.d;
+      document.getElementById('month').value = lastConverted.m;
+      document.getElementById('year').value = lastConverted.y;
+      convert();
+    }
+
+    function setToday() {
+      const now = new Date();
+      const utc = new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()));
+      if (mode === 'g2h') {
+        document.getElementById('day').value = utc.getUTCDate();
+        document.getElementById('month').value = utc.getUTCMonth() + 1;
+        document.getElementById('year').value = utc.getUTCFullYear();
+      } else {
+        const h = getHijriParts(utc);
+        document.getElementById('day').value = h.d;
+        document.getElementById('month').value = h.m;
+        document.getElementById('year').value = h.y;
+      }
+      convert();
+    }
+
+    function testExample() {
+      mode = 'g2h';
+      document.getElementById('tab-g2h').classList.add('active');
+      document.getElementById('tab-h2g').classList.remove('active');
+      populateSelectors();
+      document.getElementById('day').value = 2;
+      document.getElementById('month').value = 2;
+      document.getElementById('year').value = 2010;
+      convert();
+    }
+
+    function showWarn(msg) {
+      const w = document.getElementById('warnBox');
+      if (msg) {
+        w.textContent = msg;
+        w.style.display = 'block';
+      } else {
+        w.style.display = 'none';
+      }
+    }
+
+    function hijriToGregorian(hy, hm, hd) {
+      // Approximate Gregorian year
+      const approxGYear = Math.floor((hy - 1) * 0.970224 + 622);
+      const startMs = Date.UTC(approxGYear - 1, 0, 1);
+      const endMs = Date.UTC(approxGYear + 2, 11, 31);
+      const dayMs = 86400000;
+
+      // Binary search for matching Hijri year/month/day
+      let lo = Math.floor(startMs / dayMs);
+      let hi = Math.floor(endMs / dayMs);
+      const targetVal = hy * 10000 + hm * 100 + hd;
+
+      while (lo <= hi) {
+        const mid = Math.floor((lo + hi) / 2);
+        const dt = new Date(mid * dayMs);
+        const h = getHijriParts(dt);
+        const val = h.y * 10000 + h.m * 100 + h.d;
+        if (val === targetVal) {
+          return { date: dt, adjusted: false };
+        } else if (val < targetVal) {
+          lo = mid + 1;
+        } else {
+          hi = mid - 1;
+        }
+      }
+      // If day 30 didn't exist in a 29-day Hijri month, check day 29
+      if (hd === 30) {
+        const fallback = hijriToGregorian(hy, hm, 29);
+        if (fallback) return { date: fallback.date, adjusted: true };
+      }
+      return null;
+    }
+
+    function convert() {
+      showWarn('');
+      const d = parseInt(document.getElementById('day').value, 10);
+      const m = parseInt(document.getElementById('month').value, 10);
+      const y = parseInt(document.getElementById('year').value, 10);
+
+      if (!y || y < 1300 || (mode === 'g2h' && y < 1900) || (mode === 'g2h' && y > 2075) || (mode === 'h2g' && (y < 1318 || y > 1499))) {
+        document.getElementById('resMain').textContent = 'خارج النطاق المدعوم';
+        document.getElementById('resSub').textContent = mode === 'g2h'
+          ? 'يدعم تقويم أم القرى السنوات بين 1900 و 2075 ميلادي'
+          : 'يدعم تقويم أم القرى السنوات بين 1318 و 1499 هجري';
+        lastConverted = null;
+        return;
+      }
+
+      if (mode === 'g2h') {
+        const maxG = new Date(Date.UTC(y, m, 0)).getUTCDate();
+        let actualD = d;
+        if (d > maxG) {
+          actualD = maxG;
+          showWarn(`تنبيه: شهر ${GREG_MONTHS[m - 1]} ${y} يحتوي على ${maxG} يوماً فقط، تم التحويل لليوم ${maxG}.`);
+        }
+        const utc = new Date(Date.UTC(y, m - 1, actualD));
+        const h = getHijriParts(utc);
+        const dayName = DAYS_AR[utc.getUTCDay()];
+
+        document.getElementById('resLabel').textContent = 'التاريخ الهجري الموافق (أم القرى)';
+        document.getElementById('resMain').textContent = `${dayName}، ${h.d} ${HIJRI_MONTHS[h.m - 1]} ${h.y} هـ`;
+        document.getElementById('resSub').textContent = `${h.y}/${String(h.m).padStart(2, '0')}/${String(h.d).padStart(2, '0')} هـ`;
+        lastConverted = { d: h.d, m: h.m, y: h.y };
+      } else {
+        const res = hijriToGregorian(y, m, d);
+        if (!res) {
+          document.getElementById('resMain').textContent = 'تعذّر التحويل';
+          document.getElementById('resSub').textContent = 'تأكد من صحة التاريخ المدخل';
+          lastConverted = null;
+          return;
+        }
+        if (res.adjusted) {
+          showWarn(`تنبيه: شهر ${HIJRI_MONTHS[m - 1]} ${y} هـ كان 29 يوماً فقط، تم عرض الموافق ليوم 29.`);
+        }
+        const dt = res.date;
+        const gd = dt.getUTCDate();
+        const gm = dt.getUTCMonth() + 1;
+        const gy = dt.getUTCFullYear();
+        const dayName = DAYS_AR[dt.getUTCDay()];
+
+        document.getElementById('resLabel').textContent = 'التاريخ الميلادي الموافق';
+        document.getElementById('resMain').textContent = `${dayName}، ${gd} ${GREG_MONTHS[gm - 1]} ${gy} م`;
+        document.getElementById('resSub').textContent = `${gy}/${String(gm).padStart(2, '0')}/${String(gd).padStart(2, '0')} م`;
+        lastConverted = { d: gd, m: gm, y: gy };
+      }
+    }
+
+    function copyResult() {
+      const text = document.getElementById('resMain').textContent;
+      if (!text || text === '—') return;
+      navigator.clipboard?.writeText(text).then(() => {
+        const btn = document.getElementById('copyBtn');
+        btn.textContent = 'تم النسخ ✓';
+        setTimeout(() => btn.textContent = 'نسخ النتيجة', 1500);
+      });
+    }
+
+    // Register Service Worker for offline PWA
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').catch(() => {});
+      });
+    }
+
+    populateSelectors();
+    setToday();
+  </script>
+</body>
+</html>
